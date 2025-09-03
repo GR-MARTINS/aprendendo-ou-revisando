@@ -15,8 +15,15 @@ ROOT_PATH = Path(__file__).parent
 #   - chamar a função connect e fornecer os dados para a conexão.
 #   - os dados para conexão vão variar de acordo com o banco que está sendo utilizado.
 conn = sqlite3.connect(ROOT_PATH/"clientes.db")
-print(conn)
 
+# Após realizar as operações necessárias, a conexão deve ser fechada
+conn.close()
+
+#para garantir que a conexão será fechada, use with.
+with sqlite3.connect(ROOT_PATH/"clientes.db") as conn:
+    #operações aqui
+    conn
+        
 # Exemplos de conexão com outros bancos:
 # conexão com postgreSQL
 """
