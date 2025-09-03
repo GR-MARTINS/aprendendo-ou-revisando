@@ -2,8 +2,9 @@
 # exemplos com o pip:
 #    -mysql: pip install mysql-connector-python
 #    -postgreSQL: pip install psycopg
+#    -postgreSQL: pip install oracledb
 
-# passo 2 - importar o drive do banco de dados. 
+# passo 2 - importar o drive do banco de dados.
 # Neste caso, o banco de dados é o sqlite.
 import sqlite3
 from pathlib import Path
@@ -11,19 +12,19 @@ from pathlib import Path
 
 ROOT_PATH = Path(__file__).parent
 
-# passo 3 - Criara conexão. Indenpendente do banco, o padrão é o mesmo: 
+# passo 3 - Criara conexão. Indenpendente do banco, o padrão é o mesmo:
 #   - chamar a função connect e fornecer os dados para a conexão.
 #   - os dados para conexão vão variar de acordo com o banco que está sendo utilizado.
-conn = sqlite3.connect(ROOT_PATH/"clientes.db")
+conn = sqlite3.connect(ROOT_PATH / "clientes.db")
 
 # Após realizar as operações necessárias, a conexão deve ser fechada
 conn.close()
 
-#para garantir que a conexão será fechada, use with.
-with sqlite3.connect(ROOT_PATH/"clientes.db") as conn:
-    #operações aqui
+# para garantir que a conexão será fechada, use with.
+with sqlite3.connect(ROOT_PATH / "clientes.db") as conn:
+    # operações aqui
     conn
-        
+
 # Exemplos de conexão com outros bancos:
 # conexão com postgreSQL
 """
@@ -41,8 +42,8 @@ except psycopg.Error as erro:
 """
 # conexão com mysql
 """
-# conexão com mysql
 import mysql.connector
+
 try:
     conn = mysql.connector.connect(
             host="your_host",
@@ -52,4 +53,18 @@ try:
         )
 except mysql.connector.Error as erro:
     print(f"Error: {erro}")
-        """
+"""
+# conexão com oracle
+"""
+import oracledb
+
+try:
+    conn = oracledb.connect(
+            host="your_host",
+            user="your_username",
+            passwd="your_password",
+            database="your_database"
+        )
+except oracledb.Error as erro:
+    print(f"Error: {erro}")
+"""
