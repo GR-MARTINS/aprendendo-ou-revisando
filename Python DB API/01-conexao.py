@@ -25,6 +25,13 @@ with sqlite3.connect(ROOT_PATH / "clientes.db") as conn:
     # operações aqui
     conn
 
+
+# melhor prática
+class NomeDaTabelaRepository:
+    # para sqlite
+    def __init__(self, string_de_conexao):
+        self.conexao = sqlite3.connect(string_de_conexao)
+
 # Exemplos de conexão com outros bancos:
 # conexão com postgreSQL
 """
