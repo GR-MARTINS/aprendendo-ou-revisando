@@ -1,16 +1,26 @@
 import sqlite3
 from pathlib import Path
-
+from exceptions import ErroDeConexao, ErroAoCriarTabelaCliente
 
 ROOT_PATH = Path(__file__).parent
 
 
 # Eu estava usando desta forma
 # Isso não é uma boa prática
-def criar_conexao():
-    with sqlite3.connect(ROOT_PATH / "clientes.db") as conn:
-        # conn é retornado já fechado.
-        return conn
+
+# def criar_conexao():
+#     with sqlite3.connect(ROOT_PATH / "clientes.db") as conn:
+#         # conn é retornado já fechado.
+#         return conn
+
+
+# Essa forma é mais adequada do que a anterior
+def criar_conexao(driver, string_de_conexao):
+    try:
+        return driver.connect(string_de_conexao)
+
+    except driver.Error as erro:
+        raise ErroDeConexao(f"Erro ao conectar no banco! {erro}")
 
 
 # o mais adequado seria assim:
@@ -30,8 +40,8 @@ class ClienteRepository:
                     email VARCHAR(150))
                 """
                 )
-        except self.driver.Error:
-            raise
+        except self.driver.Error as erro:
+            raise ErroDeConexao(f"Erro ao conectar no banco! {erro}")
 
 
 # o exemplo de operações pode ser usado conforme descrito abaixo
@@ -41,8 +51,7 @@ class ClienteRepository:
 # lembrando! A melhor prática é o repositório, especialmente para projetos maiores.
 
 
-def criar_tabela(driver, string_de_conexao):
-    conn = driver.connect(string_de_conexao)
+def criar_tabela(conn):
     cursor = conn.cursor()
 
     # mais de uma operação pode ser enviada ao mesmo tempo
@@ -57,11 +66,11 @@ def criar_tabela(driver, string_de_conexao):
         # executa as operações no banco
         conn.commit()
 
-    except driver.Error:
+    except Exception as erro:
         # descarta as operações caso haja erro
         conn.rollback()
         conn.close()
-        raise
+        raise ErroAoCriarTabelaCliente(f"Erro ao criar tabela clientes! {erro}")
 
     # como não usamos o with no exemplo anterior,
     # se isso fosse feito de outra forma (fora do try except),
@@ -75,14 +84,15 @@ def criar_tabela(driver, string_de_conexao):
 # EXEMPLOS DE EXECUÇÃO
 
 # via função
-string_de_conexao = ROOT_PATH / "cliente.db"
+string_de_conexao = ROOT_PATH / "clientes.db"
 
 try:
-    criar_tabela(sqlite3, string_de_conexao)
+    conn = criar_conexao(sqlite3, string_de_conexao)
+    criar_tabela(conn)
     print("Tabela criada com sucesso!")
 
-except Exception as erro:
-    print(f"Ocorreu um erro ao criar a tabela: {erro}")
+except (ErroDeConexao, ErroAoCriarTabelaCliente) as erro:
+    print(f"{erro}")
 
 # via repositorio
 repo = ClienteRepository(sqlite3, string_de_conexao)
@@ -90,5 +100,6 @@ repo = ClienteRepository(sqlite3, string_de_conexao)
 try:
     repo.criar_tabela()
     print("Tabela criada com sucesso!")
-except Exception as erro:
-    print(f"Ocorreu um erro ao criar a tabela: {erro}")
+
+except (ErroDeConexao, ErroAoCriarTabelaCliente) as erro:
+    print(f"{erro}")
