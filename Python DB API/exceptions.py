@@ -6,3 +6,11 @@ class ErroDeConexao(Exception):
 
 class ErroAoCriarTabelaCliente(Exception):
     """Excessão personalida para erros na criação da tabela cliente"""
+
+    pass
+
+
+class ErroAoInserirCliente(Exception):
+    """Excessão personalida para erros ao salvar na tabela clientes"""
+
+    pass
