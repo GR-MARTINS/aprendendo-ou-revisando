@@ -14,3 +14,9 @@ class ErroAoInserirCliente(Exception):
     """Excessão personalida para erros ao salvar na tabela clientes"""
 
     pass
+
+
+class ErroAoAtualizarCliente(Exception):
+    """Excessão personalida para erros ao atualizar registros na tabela clientes"""
+
+    pass
