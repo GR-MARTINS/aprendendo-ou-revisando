@@ -21,5 +21,14 @@ class ErroAoAtualizarCliente(Exception):
 
     pass
 
+
 class ErroAoExcluirCliente(Exception):
     """excessão personalida para erros ao excluir registos da tabela clientes"""
+
+    pass
+
+
+class ErroAoInserirClientes(Exception):
+    """Excessão personalida para erros ao inserir registros em lote na tabela clientes."""
+
+    pass
