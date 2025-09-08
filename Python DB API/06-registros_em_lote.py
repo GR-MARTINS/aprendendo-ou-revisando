@@ -105,6 +105,7 @@ def atualizar_registro(conn, **kwargs):
         )
         conn.commit()
     except Exception as erro:
+        conn.rollback()
         raise ErroAoAtualizarCliente(f"Erro ao atualizar cliente! {erro}")
 
 
@@ -114,6 +115,7 @@ def excluir_registro(conexao, **kwargs):
         cursor.execute("DELETE FROM clientes WHERE id=?", (kwargs.get("id"),))
         conexao.commit()
     except Exception as erro:
+        conexao.rollback()
         raise ErroAoExcluirCliente(f"Erro ao excluir cliente! {erro}")
 
 
@@ -124,6 +126,7 @@ def inserir_varios_registros(conexao, dados: list[tuple]):
         cursor.executemany("INSERT INTO clientes (nome, email) VALUES (?, ?)", dados)
         conexao.commit()
     except Exception as erro:
+        conexao.rollback()
         raise ErroAoInserirClientes(f"Erro ao inserir clientes!{erro}")
 
 
