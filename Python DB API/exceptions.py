@@ -50,3 +50,9 @@ class ErroAoListarClientesOrdenadosPorNome(Exception):
     """exceção personalida para erros ao listar clientes ordenados por nome no banco."""
 
     pass
+
+
+class ErroAoListarPorEmail(Exception):
+    """Exceção personalizada para erros ao buscar clientes por email."""
+
+    pass
