@@ -44,3 +44,9 @@ class ErroAoBuscarClientes(Exception):
     """exceção personalida para erros ao buscar clientes no banco."""
 
     pass
+
+
+class ErroAoListarClientesOrdenadosPorNome(Exception):
+    """exceção personalida para erros ao listar clientes ordenados por nome no banco."""
+
+    pass
