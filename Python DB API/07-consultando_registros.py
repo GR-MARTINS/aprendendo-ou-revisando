@@ -1,9 +1,5 @@
 import sqlite3
 from pathlib import Path
-
-
-import sqlite3
-from pathlib import Path
 from exceptions import (
     ErroDeConexao,
     ErroAoCriarTabelaCliente,
@@ -13,6 +9,7 @@ from exceptions import (
     ErroAoInserirClientes,
     ErroAoBuscarCliente,
     ErroAoBuscarClientes,
+    ErroAoListarClientesOrdenadosPorNome,
 )
 
 ROOT_PATH = Path(__file__).parent
@@ -156,6 +153,33 @@ def listar_clientes(conexao):
         raise ErroAoBuscarClientes(f"Erro ao buscar clientes! {erro}")
 
 
+def listar_clientes_ordenados_por_nome(conexao, ordem: str = "ASC"):
+    """Busca todos os clientes no banco e ordena por nome
+
+    Args:
+        conexao (any): objeto de conexao com o banco de dados
+        ordem (str): informe 'ASC' para ordenar de forma crescente e 'DESC'  para ordenar de forma decrescente.
+
+    Returns:
+        list[tuple]: lista de tuplas, onde cada tupla armazena as informações de um cliente.
+    """
+    try:
+        cursor = conexao.cursor()
+        # Nesse caso, não dá para passar a ordem através do place holder '?'
+        # Já que os valores de ordem são conhecidos, para evitar
+        # sql injection, use um if.
+        if ordem not in ["ASC", "DESC"]:
+            raise ErroAoListarClientesOrdenadosPorNome(
+                "A ordem deve ser 'ASC' ou 'DESC'"
+            )
+        cursor.execute(f"SELECT * FROM clientes ORDER BY nome {ordem}")
+        return cursor.fetchall()
+    except Exception as erro:
+        raise ErroAoListarClientesOrdenadosPorNome(
+            f"Erro ao listar clientes ordenados por nome! {erro}"
+        )
+
+
 # Repositório
 # o mais adequado seria assim:
 class ClienteRepository:
@@ -247,6 +271,32 @@ class ClienteRepository:
         except Exception as erro:
             raise ErroAoBuscarClientes(f"Erro ao buscar clientes! {erro}")
 
+    def listar_clientes_ordenados_por_nome(self, ordem: str = "ASC"):
+        """Busca todos os clientes no banco e ordena por nome
+
+        Args:
+            ordem (str): 'ASC' para ordenar de forma crescente e 'DESC'  para ordenar de forma decrescente.
+
+        Returns:
+            list[tuple]: lista de tuplas, onde cada tupla armazena as informações de um cliente.
+        """
+        try:
+            with self.conexao as conn:
+                cursor = conn.cursor()
+                # Nesse caso, não dá para passar a ordem através do place holder '?'
+                # Já que os valores de ordem são conhecidos, para evitar
+                # sql injection, use um if.
+                if ordem not in ["ASC", "DESC"]:
+                    raise ErroAoListarClientesOrdenadosPorNome(
+                        "A ordem deve ser 'ASC' ou 'DESC'"
+                    )
+                cursor.execute(f"SELECT * FROM clientes ORDER BY nome {ordem}")
+                return cursor.fetchall()
+        except Exception as erro:
+            raise ErroAoListarClientesOrdenadosPorNome(
+                f"Erro ao listar clientes ordenados por nome! {erro}"
+            )
+
 
 # EXEMPLOS DE EXECUÇÃO
 
@@ -273,7 +323,8 @@ string_de_conexao = ROOT_PATH / "cliente.db"
 #     inserir_varios_registros(conn, dados)
 #     print(f"Clientes cadastrados com Sucesso!")
 #     print(recuperar_cliente(conn, 2))
-#     print(listar_clientes())     
+#     print(listar_clientes(conn))
+#     print(listar_clientes_ordenados_por_nome(conn, ordem="ASC"))
 #     conn.close()
 
 # except Exception as erro:
@@ -301,6 +352,7 @@ try:
     print(f"Clientes cadastrados com Sucesso!")
     print(repo.recuperar_cliente(2))
     print(repo.listar_clientes())
+    print(repo.listar_clientes_ordenados_por_nome(ordem="ASC"))
 
 except Exception as erro:
     print(f"{erro}")
