@@ -10,6 +10,7 @@ from exceptions import (
     ErroAoBuscarCliente,
     ErroAoBuscarClientes,
     ErroAoListarClientesOrdenadosPorNome,
+    ErroAoListarPorEmail,
 )
 
 ROOT_PATH = Path(__file__).parent
@@ -180,6 +181,15 @@ def listar_clientes_ordenados_por_nome(conexao, ordem: str = "ASC"):
         )
 
 
+def listar_clientes_por_email(conexao, email):
+    try:
+        cursor = conexao.cursor()
+        cursor.execute("SELECT * FROM clientes WHERE email LIKE ?", (f"%{email}%",))
+        return cursor.fetchall()
+    except Exception as erro:
+        raise ErroAoListarPorEmail(f"Erro ao listar clientes por email! {erro}")
+
+
 # Repositório
 # o mais adequado seria assim:
 class ClienteRepository:
@@ -297,6 +307,17 @@ class ClienteRepository:
                 f"Erro ao listar clientes ordenados por nome! {erro}"
             )
 
+    def listar_clientes_por_email(self, email):
+        try:
+            with self.conexao as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "SELECT * FROM clientes WHERE email LIKE ?", (f"%{email}%",)
+                )
+                return cursor.fetchall()
+        except Exception as erro:
+            raise ErroAoListarPorEmail(f"Erro ao listar clientes por email! {erro}")
+
 
 # EXEMPLOS DE EXECUÇÃO
 
@@ -353,6 +374,7 @@ try:
     print(repo.recuperar_cliente(2))
     print(repo.listar_clientes())
     print(repo.listar_clientes_ordenados_por_nome(ordem="ASC"))
+    print(repo.listar_por_email(ordem="ASC"))
 
 except Exception as erro:
     print(f"{erro}")
