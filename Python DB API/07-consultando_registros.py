@@ -12,6 +12,7 @@ from exceptions import (
     ErroAoExcluirCliente,
     ErroAoInserirClientes,
     ErroAoBuscarCliente,
+    ErroAoBuscarClientes,
 )
 
 ROOT_PATH = Path(__file__).parent
@@ -146,6 +147,15 @@ def recuperar_cliente(conexao, id):
         raise ErroAoBuscarCliente(f"Erro ao buscar cliente! {erro}")
 
 
+def listar_clientes(conexao):
+    cursor = conexao.cursor()
+    try:
+        cursor.execute("SELECT * FROM clientes")
+        return cursor.fetchall()
+    except Exception as erro:
+        raise ErroAoBuscarClientes(f"Erro ao buscar clientes! {erro}")
+
+
 # Repositório
 # o mais adequado seria assim:
 class ClienteRepository:
@@ -228,6 +238,15 @@ class ClienteRepository:
         except Exception as erro:
             raise ErroAoBuscarCliente(f"Erro ao buscar cliente! {erro}")
 
+    def listar_clientes(self):
+        try:
+            with self.conexao as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM clientes")
+                return cursor.fetchall()
+        except Exception as erro:
+            raise ErroAoBuscarClientes(f"Erro ao buscar clientes! {erro}")
+
 
 # EXEMPLOS DE EXECUÇÃO
 
@@ -253,7 +272,8 @@ string_de_conexao = ROOT_PATH / "cliente.db"
 #     ]
 #     inserir_varios_registros(conn, dados)
 #     print(f"Clientes cadastrados com Sucesso!")
-#     print(recuperar_cliente(conn, 2))      
+#     print(recuperar_cliente(conn, 2))
+#     print(listar_clientes())     
 #     conn.close()
 
 # except Exception as erro:
@@ -280,9 +300,7 @@ try:
     repo.inserir_varios_registros(dados)
     print(f"Clientes cadastrados com Sucesso!")
     print(repo.recuperar_cliente(2))
+    print(repo.listar_clientes())
 
 except Exception as erro:
     print(f"{erro}")
-
-
-
