@@ -33,7 +33,14 @@ class ErroAoInserirClientes(Exception):
 
     pass
 
+
 class ErroAoBuscarCliente(Exception):
-    """exceção personalida para erros buscar um cliente no banco."""
+    """exceção personalida para erros ao buscar um cliente no banco."""
+
+    pass
+
+
+class ErroAoBuscarClientes(Exception):
+    """exceção personalida para erros ao buscar clientes no banco."""
 
     pass
