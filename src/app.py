@@ -1,10 +1,12 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from src.models.base import Base
 
 
 db = SQLAlchemy(model_class=Base)
+migrate = Migrate()
 
 
 def create_app(environment=os.environ["FLASK_ENV"]):
@@ -17,6 +19,7 @@ def create_app(environment=os.environ["FLASK_ENV"]):
 
     # Init apps
     db.init_app(app)
+    migrate.init_app(app, db)
 
     # Register bluprints
     from src.blueprints import docs
