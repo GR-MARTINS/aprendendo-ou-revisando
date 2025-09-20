@@ -1,5 +1,10 @@
 import os
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from src.models.base import Base
+
+
+db = SQLAlchemy(model_class=Base)
 
 
 def create_app(environment=os.environ["FLASK_ENV"]):
@@ -11,6 +16,7 @@ def create_app(environment=os.environ["FLASK_ENV"]):
     app.config.from_object(config_path)
 
     # Init apps
+    db.init_app(app)
 
     # Register bluprints
     from src.blueprints import docs
