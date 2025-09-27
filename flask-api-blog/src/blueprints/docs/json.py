@@ -2,6 +2,8 @@ from flask import Blueprint
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
+from src.schemas.utils import MessageSchema
+import src.blueprints as bp
 
 spec = APISpec(
     title="DIO Blog API",
@@ -11,9 +13,15 @@ spec = APISpec(
     plugins=[FlaskPlugin(), MarshmallowPlugin()],
 )
 
+spec.components.schema("MessageSchema", schema=MessageSchema)
+
 app = Blueprint("api_spec", __name__, url_prefix="/docs")
 
 
 @app.route("/swagger.json")
 def api_spec_json():
-    return {}
+    return (
+        spec.path(view=bp.user.create_user)
+        .path(view=bp.role.create_role)
+        .to_dict()
+        )
