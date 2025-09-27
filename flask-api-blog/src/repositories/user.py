@@ -15,7 +15,8 @@ class UserRepository:
             password=bcrypt.generate_password_hash(data.get("password")),
             date_of_birth=datetime.strptime(data.get("date_of_birth"), "%Y-%m-%d"),
             gender=UserGender.male,
-            updated_at=datetime.now()
+            updated_at=datetime.now(),
+            role_id=data.get("role_id")
         )
         db.session.add(user)
         db.session.commit()
