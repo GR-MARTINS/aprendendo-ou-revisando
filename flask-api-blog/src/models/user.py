@@ -30,19 +30,19 @@ class User(db.Model):
         sa.DateTime(timezone=True), server_onupdate=sa.func.now()
     )
     date_of_birth: Mapped[date] = mapped_column(sa.Date, nullable=False)
-     # Auditorias em que este usuário foi o alvo da modificação
+    # Auditorias em que este usuário foi o alvo da modificação
     audits: Mapped[list["UserAudit"]] = relationship(
-        "UserAudit",
-        foreign_keys="UserAudit.user_id",
-        back_populates="modified_user"
+        "UserAudit", foreign_keys="UserAudit.user_id", back_populates="modified_user"
     )
 
     # Auditorias em que este usuário foi o modificador
     modifications: Mapped[list["UserAudit"]] = relationship(
         "UserAudit",
         foreign_keys="UserAudit.modified_by_id",
-        back_populates="modifying_user"
+        back_populates="modifying_user",
     )
+    role_id: Mapped[int] = mapped_column(sa.ForeignKey("roles.id", name="fk_role_user"), nullable=False)
+    role: Mapped["Role"] = relationship(back_populates="users")
 
     def __repr__(self):
         return f"<User(id={self.id}, username={self.username})>"
