@@ -5,11 +5,14 @@ from flask_migrate import Migrate
 from src.models.base import Base
 from flask_bcrypt import Bcrypt
 from flask_marshmallow import Marshmallow
+from flask_jwt_extended import JWTManager
+
 
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 bcrypt = Bcrypt()
 ma = Marshmallow()
+jwt = JWTManager()
 
 def create_app(environment=os.environ["FLASK_ENV"]):
     app = Flask(__name__, instance_relative_config=True)
@@ -24,14 +27,18 @@ def create_app(environment=os.environ["FLASK_ENV"]):
     migrate.init_app(app, db)
     bcrypt.init_app(app)
     ma.init_app(app)
+    jwt.init_app(app)
+
+    # import listeners
     import src.audits
 
     # Register bluprints
-    from src.blueprints import docs, user, role
+    from src.blueprints import docs, user, role, auth
 
     app.register_blueprint(docs.json.app)
     app.register_blueprint(docs.ui.app)
     app.register_blueprint(user.app)
     app.register_blueprint(role.app)
+    app.register_blueprint(auth.app)
 
     return app
