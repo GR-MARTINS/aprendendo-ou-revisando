@@ -20,3 +20,9 @@ class UserRepository:
         )
         db.session.add(user)
         db.session.commit()
+
+    @classmethod
+    def get_user_by_username(cls, username: str):
+        query = db.select(User).where(User.username == username)
+        user = db.session.execute(query).scalar()
+        return user
