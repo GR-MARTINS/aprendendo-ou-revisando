@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from flask import Blueprint, request
 from src.repositories.role import UserRepository as repo
 from src.schemas.role import CreateRoleSchema
@@ -28,4 +29,4 @@ def create_role():
     """
     data = request.json
     repo.save_role(data)
-    return {"message": "role created"}
+    return {"message": "role created"}, HTTPStatus.CREATED
