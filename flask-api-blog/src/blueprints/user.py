@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from flask import Blueprint, request
 from src.repositories.user import UserRepository as repo
 from src.schemas.user import CreateUserSchema
@@ -29,4 +30,4 @@ def create_user():
     """
     data = request.json
     repo.save_user(data)
-    return {"message": "user created"}
+    return {"message": "user created"}, HTTPStatus.CREATED
