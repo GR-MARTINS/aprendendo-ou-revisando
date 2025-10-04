@@ -8,6 +8,6 @@ class RoleService:
     def create_role(cls, data: dict):
         try:
             data_validated = CreateRoleSchema().load(data)
-            repo.save_role(data_validated)
+            repo.save(data_validated)
         except Exception:
             raise

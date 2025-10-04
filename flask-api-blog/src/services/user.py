@@ -7,6 +7,6 @@ class UserService:
     def create_user(cls, data: dict):
         try:
             data_validated = CreateUserSchema().load(data)
-            repo.save_user(data_validated)
+            repo.save(data_validated)
         except Exception:
             raise
