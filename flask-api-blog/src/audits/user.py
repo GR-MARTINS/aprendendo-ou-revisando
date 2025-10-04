@@ -1,7 +1,8 @@
 import json
-from sqlalchemy import event
+from sqlalchemy import event, inspect
 from src.models.user import User
 from src.models.user_audit import UserAudit
+from src.audits.utils import get_changes_from_states
 
 def _serialize(user: User):
     """Converte User em dict para salvar no log"""
@@ -25,24 +26,35 @@ def audit_insert(mapper, connection, target):
         )
     )
 
-@event.listens_for(User, "after_update")
-def audit_update(mapper, connection, target):
+@event.listens_for(User, "before_update")
+def audit_before_update(mapper, connection, target):
+    # Inspeciona o estado atual da instância
+    state = inspect(target)
+
+    old_data, new_data = get_changes_from_states(state, target)
+
+    # Monta o registro de auditoria
     connection.execute(
         UserAudit.__table__.insert().values(
             user_id=target.id,
             action="UPDATE",
-            old_data=None,  # se quiser, pode capturar snapshot anterior
-            new_data=json.dumps(_serialize(target))
+            old_data=json.dumps(old_data),
+            new_data=json.dumps(new_data),
         )
     )
 
-@event.listens_for(User, "after_delete")
+
+@event.listens_for(User, "before_delete")
 def audit_delete(mapper, connection, target):
+    state = inspect(target)
+
+    old_data, new_data = get_changes_from_states(state, target)
+
     connection.execute(
         UserAudit.__table__.insert().values(
-            user_id=target.id,
+            role_id=target.id,
             action="DELETE",
-            old_data=json.dumps(_serialize(target)),
-            new_data=None
+            old_data=json.dumps(old_data),
+            new_data=None,
         )
     )
