@@ -2,7 +2,7 @@ from flask import Blueprint
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
-from src.schemas.utils import MessageSchema
+from src.schemas.utils import MessageSchema, ValidationErrorSchema, InternalServerErrorSchema
 from src.schemas.auth import AccessTokenSchema
 
 import src.blueprints as bp
@@ -17,6 +17,8 @@ spec = APISpec(
 
 spec.components.schema("MessageSchema", schema=MessageSchema)
 spec.components.schema("AccessTokenSchema", schema=AccessTokenSchema)
+spec.components.schema("ValidationErrorSchema", schema=ValidationErrorSchema)
+spec.components.schema("InternalServerErrorSchema", schema=InternalServerErrorSchema)
 
 app = Blueprint("api_spec", __name__, url_prefix="/docs")
 
