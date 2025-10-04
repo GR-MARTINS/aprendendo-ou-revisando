@@ -1,10 +1,10 @@
+from http import HTTPStatus
 from flask import Blueprint, request
-from src.repositories.user import UserRepository as repo
-from src.app import bcrypt
 from flask_jwt_extended import create_access_token
-
+from src.services.auth import AuthService
 
 app = Blueprint("auth", __name__, url_prefix="/auth")
+
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -25,10 +25,30 @@ def login():
           content:
             application/json:
               schema: AccessTokenSchema
-              
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema: ValidationErrorSchema
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: InternalServerErrorSchema
+
     """
-    data = request.json
-    user = repo.get_user_by_username(data.get("username"))
-    checked_password = bcrypt.check_password_hash(user.password, data.get("password"))
-    if user and checked_password:
-        return {"access_token": create_access_token(str(user.id))}
+    try:
+        data = request.json
+        logged_in, access_token = AuthService.login(data)
+
+        if logged_in:
+            return {"access_token": access_token}, HTTPStatus.OK
+        
+        else:
+            return {"message": "Invalid username or password!"}, HTTPStatus.BAD_REQUEST
+        
+    except Exception as error:
+        return {
+            "message": "Internal server error",
+            "exception": type(error).__name__,
+        }, HTTPStatus.INTERNAL_SERVER_ERROR
