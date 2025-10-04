@@ -6,7 +6,7 @@ from src.app import db, bcrypt
 class UserRepository:
 
     @classmethod
-    def _parse_gender(data: dict):
+    def _parse_gender(cls, data: dict):
         gender_map = {
             "male": UserGender.male,
             "female": UserGender.female,
