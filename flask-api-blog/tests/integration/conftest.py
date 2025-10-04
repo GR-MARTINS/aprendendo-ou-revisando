@@ -74,6 +74,7 @@ def create_admin_user(client, get_admin_role):
         "password": "1234",
         "date_of_birth": "1995-11-26",
         "role_id": role.id,
+        "gender": "male",
     }
 
     response = client.post("/users/", json=payload)
@@ -90,6 +91,7 @@ def create_default_user(client, get_default_role):
         "password": "1234",
         "date_of_birth": "1995-11-26",
         "role_id": role.id,
+        "gender": "male",
     }
 
     response = client.post("/users/", json=payload)
