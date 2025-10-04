@@ -1,8 +1,7 @@
 from http import HTTPStatus
 from flask import Blueprint, request
-from src.repositories.user import UserRepository as repo
-from src.schemas.user import CreateUserSchema
-
+from marshmallow.exceptions import ValidationError
+from src.services.user import UserService
 
 app = Blueprint("users", __name__, url_prefix="/users")
 
@@ -27,7 +26,30 @@ def create_user():
           content:
             application/json:
               schema: MessageSchema
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema: ValidationErrorSchema
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema: InternalServerErrorSchema
     """
-    data = request.json
-    repo.save_user(data)
-    return {"message": "user created"}, HTTPStatus.CREATED
+    try:
+        data = request.json
+        UserService.create_user(data)
+        return {"message": "user created"}, HTTPStatus.CREATED
+
+    except ValidationError as error:
+        return {
+            "message": "Required fields missing or invalid",
+            "required_fields": list(error.messages.keys()),
+        }, HTTPStatus.BAD_REQUEST
+
+    except Exception as error:
+        return {
+            "message": "Internal Server Error",
+            "exception": type(error).__name__,
+        }, HTTPStatus.INTERNAL_SERVER_ERROR
