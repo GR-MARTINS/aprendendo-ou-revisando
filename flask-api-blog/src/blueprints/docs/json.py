@@ -2,7 +2,11 @@ from flask import Blueprint
 from apispec import APISpec
 from apispec.ext.marshmallow import MarshmallowPlugin
 from apispec_webframeworks.flask import FlaskPlugin
-from src.schemas.utils import MessageSchema, ValidationErrorSchema, InternalServerErrorSchema
+from src.schemas.utils import (
+    MessageSchema,
+    ValidationErrorSchema,
+    InternalServerErrorSchema,
+)
 from src.schemas.auth import AccessTokenSchema
 
 import src.blueprints as bp
@@ -25,4 +29,11 @@ app = Blueprint("api_spec", __name__, url_prefix="/docs")
 
 @app.route("/swagger.json")
 def api_spec_json():
-    return spec.path(view=bp.auth.login).path(view=bp.user.create_user).path(view=bp.role.create_role).to_dict()
+    return (
+        spec.path(view=bp.auth.login)
+        .path(view=bp.user.create_user)
+        .path(view=bp.role.create_role)
+        .path(view=bp.role.get_all_roles)
+        .path(view=bp.role.get_role_by_id)
+        .to_dict()
+    )
